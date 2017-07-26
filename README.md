@@ -191,9 +191,9 @@ Change some pathes in Files to run<br>
 <strong> HAVE FUN :) </strong>
 <br>
 # Troubleshooting
-<code>ERROR 500 (Internal Server Error)</code>
---> To get the Error-Message you mus open apache logfile: <code>sudo nano /var/log/apache2/error.log</code>
+<code>ERROR 500 (Internal Server Error)</code><br>
+--> To see the Errormessage you must open apache logfile:<br> <code>sudo nano /var/log/apache2/error.log</code><br>
 --> Find the error in the last 1 - 20 Lines<br>
---> If you Google for that error, you will find a lot Solutions for all errors you can see.<br>
+--> If you ask Google for that error, you will find a lot Solutions for all errors you can see.<br>
 <strong>If you can't find a solution for your error, contact me at 'davidduckwitz@googlemail.com' or your Udacity Mentor</strong>
 
