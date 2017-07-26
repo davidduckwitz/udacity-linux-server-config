@@ -171,7 +171,7 @@ __installed python and some Modules__
 Change some pathes in Files to run<br>
 <p>Update some pathes in the application.py.</p>
 1. Find <code>CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_id']</code><br>
---> Change it to <code>CLIENT_ID = json.loads(open('/var/www/catalog/client_secrets.json', 'r').read())['web']['client_id']</code>
+--> Change it to <code>CLIENT_ID = json.loads(open('/var/www/catalog/client_secrets.json', 'r').read())['web']['client_id']</code><br>
 2. Find <code>engine = create_engine('sqlite:///categories.db')</code><br>
 --> Change it to <code>engine = create_engine('sqlite:///var/www/catalog/categories.db?check_same_thread=False')</code><br>
 3. Find <code>oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')</code><br>
