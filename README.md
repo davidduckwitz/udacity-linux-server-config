@@ -10,6 +10,7 @@ Created Putty-Key-File->: https://github.com/davidduckwitz/udacity-linux-server-
 You can use a "Amazon Lightsail Server" to serve your APP. It's easy and realy cheap (First Month FREE / then 5$ / Month)<br>
 1. Create Account / Login to: https://lightsail.aws.amazon.com/ls/webapp/home <br>
 2. Create a new Instance<br>
+--> Use "OS-only" --> UBUNTU<br>
 --> Choose location of your Amazon-Server (In my case 'Frankfurt / Europe')<br>
 --> Name your instance (e.g. My Catalog-App-Server)<br>
 --> Download your SSH-Keyfile to login with SSH from Accountpage: https://lightsail.aws.amazon.com/ls/webapp/account <br>
