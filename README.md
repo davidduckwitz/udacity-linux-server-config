@@ -111,33 +111,33 @@ sudo ufw allow 123/udp
 </code></pre>
 <p>We need to enable mod wsgi if it isn't enabled: <code>sudo a2enmod wsgi</code></p>
 <p>Let's setup wsgi file and sites-available conf file for our application.
-Create the WSGI file in <code>path/to/the/application directory</code></p>
-<pre><code>WSGI file
+Create the WSGI file in <code>/var/www/catalog/</code> with the following content:</p>
+<pre><code>
 
 import sys
 import logging
 
 logging.basicConfig(stream=sys.stderr)
-sys.path.insert(0, '/var/www/itemsCatalog/vagrant/catalog')
+sys.path.insert(0, '/var/www/catalog')
 
 from application import app as application
 application.secret_key='super_secret_key'
 </code></pre>
 <p>Please note application.py is my python file. Wherever you housed your application logic.</p>
-<p>To setup a virtual host file: <code>cd /etc/apache2/sites-available/itemsCatalog.conf</code>:</p>
+<p>To setup a virtual host file: <code>cd /etc/apache2/sites-available/catalog.conf</code>:</p>
 <pre><code>Virtual Host file
 &lt;VirtualHost *:80&gt;
-     ServerName  PublicIP
-     ServerAdmin email address
+     ServerName  <strong> YOUR SERVER PublicIP</strong>
+     ServerAdmin <strong> YOUR EMAIL</strong>
      #Location of the items-catalog WSGI file
-     WSGIScriptAlias / /var/www/itemsCatalog/vagrant/catalog/itemsCatalog.wsgi
+     WSGIScriptAlias / /var/www/catalog/catalog.wsgi
      #Allow Apache to serve the WSGI app from our catalog directory
-     &lt;Directory /var/www/itemsCatalog/vagrant/catalog&gt;
+     &lt;Directory /var/www/catalog&gt;
           Order allow,deny
           Allow from all
      &lt;/Directory&gt;
      #Allow Apache to deploy static content
-     &lt;Directory /var/www/itemsCatalog/vagrant/catalog/static&gt;
+     &lt;Directory /var/www/catalog/static&gt;
         Order allow,deny
         Allow from all
      &lt;/Directory&gt;
@@ -155,9 +155,9 @@ cd /var/www/itemsCatalog
 
 sudo git clone https://github.com/harushimo/fullstack-nanodegree-vm.git  itemsCatalog
 </code></pre>
-<h3><a id="user-content-flask" class="anchor" href="#flask" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Flask</h3>
+<h3><a id="user-content-flask" class="anchor" href="#flask" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Installing Python / Flask and Modules</h3>
 
-# What i've done
+# What i've installed
 __installed python and some Modules__
 - ```sudo apt-get install python``` Python 2.7 CORE<br>
 - ```sudo apt-get install python-pip```Script to install the following python modules<br>
@@ -168,5 +168,32 @@ __installed python and some Modules__
 - ```pip install Flask-WTF```<br>
 - ```pip install functools```<br>
 <br>
-
+Change some pathes in Files to run<br>
+<p>Update some pathes in the application.py.</p>
+1. Find <code>CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_id']</code><br>
+--> Change it to <code>CLIENT_ID = json.loads(open('/var/www/catalog/client_secrets.json', 'r').read())['web']['client_id']</code>
+2. Find <code>engine = create_engine('sqlite:///categories.db')</code><br>
+--> Change it to <code>engine = create_engine('sqlite:///var/www/catalog/categories.db?check_same_thread=False')</code><br>
+3. Find <code>oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')</code><br>
+--> Change it to <code>oauth_flow = flow_from_clientsecrets('/var/www/catalog/client_secrets.json', scope='')</code><br>
+4. Find <code>app_id = json.loads(open('fb_client_secrets.json', 'r').read())['web']['app_id']</code><br>
+--> Change it to <code>app_id = json.loads(open('/var/www/catalog/fb_client_secrets.json', 'r').read())['web']['app_id']</code><br>
+5. Find <code>app_secret = json.loads(open('fb_client_secrets.json', 'r').read())['web']['app_secret']</code><br>
+--> Change it to <code>app_secret = json.loads(open('/var/www/catalog/fb_client_secrets.json', 'r').read())['web']['app_secret']</code><br>
+<p>Update some pathes in the database_setup.py.</p>
+1. Find <code>engine = create_engine(
+	'sqlite:///categories.db')</code>
+   Change it to: <code>engine = create_engine(
+	'sqlite:///var/www/catalog/categories.db?check_same_thread=False')</code>
+# Run Application
+1. Restart apache <code>sudo service apache2 restart</code>
+2. Open the PUBLIC IP of your Amazon Server in Browser<br>
+<strong> HAVE FUN :) </strong>
+<br>
+# Troubleshooting
+<code>ERROR 500 (Internal Server Error)</code>
+--> To get the Error-Message you mus open apache logfile: <code>sudo nano /var/log/apache2/error.log</code>
+--> Find the error in the last 1 - 20 Lines<br>
+--> If you Google for that error, you will find a lot Solutions for all errors you can see.<br>
+<strong>If you can't find a solution for your error, contact me at 'davidduckwitz@googlemail.com' or your Udacity Mentor</strong>
 
