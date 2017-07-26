@@ -54,6 +54,108 @@ We've created our new user, lets configure our ssh to non-default port</p>
 <h2><a id="user-content-configuring-ssh-to-a-non-default-port" class="anchor" href="#configuring-ssh-to-a-non-default-port" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Configuring SSH to a non-default port</h2>
 <p>SSH default port is 22. We want to configure it to non default port.  Since we are using LightSail, we need to open the non default port through the web interface. If you don't do this step, you'll be locked out of the instance. Go to the networking tab on the management console. Then, the firewall option</p>
 <img src="https://github.com/davidduckwitz/udacity-linux-server-config/blob/master/lightsailfirewall.png"><br>
+Go into your sshd config file: <code>sudo nano /etc/ssh/sshd_config</code>
+Change the following options. # means commented out</p>
+<pre><code># What ports, IPs and protocols we listen for
+# Port 22
+Port 2200
+
+# Authentication:
+LoginGraceTime 120
+#PermitRootLogin prohibit-password
+PermitRootLogin no
+StrictModes yes
+
+# Change to no to disable tunnelled clear text passwords
+PasswordAuthentication No
+</code></pre>
+<p>Once these changes are made, restart ssh: <code>sudo service restart ssh</code>
+Any user can login into the machine using a specify port: <code>sudo user@PublicIP -p 2200</code></p>
+<h3><a id="user-content-creating-the-ssh-keys" class="anchor" href="#creating-the-ssh-keys" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Creating the ssh keys</h3>
+<pre><code>LOCAL MACHINE:~$ ssh-keygen
+</code></pre>
+<p>Two things will happen:</p>
+<ol>
+<li>You can name the file whatever you want.  Keep in mind when you name the file it will give you a private key and public key</li>
+<li>It will prompt you for a pass phrase. You can enter one or leave it blank</li>
+</ol>
+<p>Once the keys are generated, you'll need to login to the user account aka grader here:
+You'll make a directory for ssh and store the public key in an authorized_keys files</p>
+<pre><code>mkdir .ssh
+cd .ssh
+</code></pre>
+<p>When you are in the directory, create an authorized_keys file. This where you paste the public key that you generated on your local machine.</p>
+<pre><code>sudo nano authorized_keys
+</code></pre>
+<p>Please double check your path by pwd. You should be in your <code>/home/grader/.ssh/</code> when creating the file. You should be login with grader account using the private key from local machine into the server: <code>ssh user@PublicIP -i ~/.ssh/whateverfile_id_rsa</code></p>
+<h2><a id="user-content-configuring-firewall-rules-using-ufw" class="anchor" href="#configuring-firewall-rules-using-ufw" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Configuring Firewall rules using UFW</h2>
+<p>We need to configure firewall rules using UFW. Check to see if ufw is active: <code>sudo ufw status</code>. If not active, lets add some rules</p>
+<pre><code>sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow 2200/tcp
+sudo ufw allow 80/tcp or sudo ufw allow www (either one of these commands will work)
+sudo ufw allow 123/udp
+</code></pre>
+<p>Now, you enable the rules: <code>sudo ufw enable</code> and re check the status to see what rules are activity</p>
+<h2><a id="user-content-configure-timezone-for-server" class="anchor" href="#configure-timezone-for-server" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Configure timezone for server</h2>
+<pre><code>sudo dpkg-reconfigure tzdata
+</code></pre>
+<p>Choose none of the above and choose UTC.  The server by default is on UTC.</p>
+<h2><a id="user-content-install-apache-git-and-flask" class="anchor" href="#install-apache-git-and-flask" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Install Apache, Git, and flask</h2>
+<h3><a id="user-content-apache" class="anchor" href="#apache" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Apache</h3>
+<p>We will be installing apache on our server. To do that:</p>
+<pre><code>sudo apt-get install apache2
+</code></pre>
+<p>If apache was setup correctly, a welcome page will come up when you use the PublicIP. We are going to install mod wsgi, python setup tools, and python-dev</p>
+<pre><code>sudo apt-get install libapache2-mod-wsgi python-dev
+</code></pre>
+<p>We need to enable mod wsgi if it isn't enabled: <code>sudo a2enmod wsgi</code></p>
+<p>Let's setup wsgi file and sites-available conf file for our application.
+Create the WSGI file in <code>path/to/the/application directory</code></p>
+<pre><code>WSGI file
+
+import sys
+import logging
+
+logging.basicConfig(stream=sys.stderr)
+sys.path.insert(0, '/var/www/itemsCatalog/vagrant/catalog')
+
+from application import app as application
+application.secret_key='super_secret_key'
+</code></pre>
+<p>Please note application.py is my python file. Wherever you housed your application logic.</p>
+<p>To setup a virtual host file: <code>cd /etc/apache2/sites-available/itemsCatalog.conf</code>:</p>
+<pre><code>Virtual Host file
+&lt;VirtualHost *:80&gt;
+     ServerName  PublicIP
+     ServerAdmin email address
+     #Location of the items-catalog WSGI file
+     WSGIScriptAlias / /var/www/itemsCatalog/vagrant/catalog/itemsCatalog.wsgi
+     #Allow Apache to serve the WSGI app from our catalog directory
+     &lt;Directory /var/www/itemsCatalog/vagrant/catalog&gt;
+          Order allow,deny
+          Allow from all
+     &lt;/Directory&gt;
+     #Allow Apache to deploy static content
+     &lt;Directory /var/www/itemsCatalog/vagrant/catalog/static&gt;
+        Order allow,deny
+        Allow from all
+     &lt;/Directory&gt;
+      ErrorLog ${APACHE_LOG_DIR}/error.log
+      LogLevel warn
+      CustomLog ${APACHE_LOG_DIR}/access.log combined
+&lt;/VirtualHost&gt;
+
+</code></pre>
+<h3><a id="user-content-git" class="anchor" href="#git" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Git</h3>
+<p><code>sudo apt-get install git</code></p>
+<p>Clone repository into the apache directory. In the <code>cd /var/www</code></p>
+<pre><code>mkdir itemsCatalog
+cd /var/www/itemsCatalog
+
+sudo git clone https://github.com/harushimo/fullstack-nanodegree-vm.git  itemsCatalog
+</code></pre>
+<h3><a id="user-content-flask" class="anchor" href="#flask" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Flask</h3>
 
 # What i've done
 __installed python and some Modules__
@@ -66,5 +168,5 @@ __installed python and some Modules__
 - ```pip install Flask-WTF```<br>
 - ```pip install functools```<br>
 <br>
-Locate the SSH key you created for the grader user.<br>
+
 
