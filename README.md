@@ -3,8 +3,7 @@
 SSH IP : 52.58.237.3 (Static IP) <br>
 SSH Port: 2200 (Changed from 22)<br>
 URL to App: http://52.58.237.3 <br>
-Your Keyfile for SSH -->: https://github.com/davidduckwitz/udacity-linux-server-config/blob/master/key.pem<br>
-Created Putty-Key-File->: https://github.com/davidduckwitz/udacity-linux-server-config/blob/master/putty-key.ppk<br>
+
 
 # Use Amazon Lightsail Server to serve Catalog Script
 You can use a "Amazon Lightsail Server" to serve your APP. It's easy and realy cheap (First Month FREE / then 5$ / Month)<br>
